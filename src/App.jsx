@@ -8,12 +8,15 @@ import InfoTickets from "./components/InfoTickets";
 
 function App() {
   const [tickets, setTickets] = useState([]);
-  const [infoTickets, setInfoTickets] = useState([]);
   const [servicios, setServicios] = useState([]);
+  const [infoTickets, setInfoTickets] = useState([]);
   const [changeColorServicio, setChangeColorServicio] = useState(false);
+
+  //!Filtros y ID
   const [checkTicketGestor, setCheckTicketGestor] = useState(false);
   const [checkTicketSinAtender, setCheckTicketSinAtender] = useState(false);
   const [idServicioGlobal, setIdServicioGlobal] = useState("0");
+  const [fechaInicioGlobal, setFechaInicioGlobal] = useState("");
 
   const fetchData = async () => {
     try {
@@ -80,7 +83,6 @@ function App() {
       const data = response.data;
       setInfoTickets(data);
       setTickets(data[0].tickets);
-      console.log(url);
     } catch (error) {
       console.log(error);
     }
@@ -99,7 +101,27 @@ function App() {
       const data = response.data;
       setInfoTickets(data);
       setTickets(data[0].tickets);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleFechaInicio = async (e) => {
+    const fechaInicio = e.target.value;
+    const fechaInicioFormat = fechaInicio.split("-").join("");
+
+    const url = `https://bio.contactek.com/bio/api_listado_base/?id=${idServicioGlobal}&mt=${
+      checkTicketGestor ? "1" : "0"
+    }&gestor=elabarca&sa=${
+      checkTicketSinAtender ? "1" : "0"
+    }&fdesde=${fechaInicioFormat}&fhasta=&busqueda=`;
+    try {
+      const response = await axios.get(url);
       console.log(url);
+
+      const data = response.data;
+      setInfoTickets(data);
+      setTickets(data[0].tickets);
     } catch (error) {
       console.log(error);
     }
@@ -151,7 +173,7 @@ function App() {
           <div>
             <div className="flex items-center gap-1">
               <span className="flex-1">Desde: </span>
-              <input type="date" />
+              <input type="date" onChange={handleFechaInicio} />
             </div>
 
             <div className="flex items-center gap-1">
