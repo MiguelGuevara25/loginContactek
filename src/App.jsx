@@ -17,6 +17,7 @@ function App() {
   const [checkTicketSinAtender, setCheckTicketSinAtender] = useState(false);
   const [idServicioGlobal, setIdServicioGlobal] = useState("0");
   const [fechaInicioGlobal, setFechaInicioGlobal] = useState("");
+  const [fechaFinGlobal, setFechaFinGlobal] = useState("");
 
   const fetchData = async () => {
     try {
@@ -76,7 +77,7 @@ function App() {
       checkTicketGestor ? "0" : "1"
     }&gestor=elabarca&sa=${
       checkTicketSinAtender ? "1" : "0"
-    }&fdesde=&fhasta=&busqueda=`;
+    }&fdesde=${fechaInicioGlobal}&fhasta=&busqueda=`;
     try {
       const response = await axios.get(url);
 
@@ -94,7 +95,7 @@ function App() {
       checkTicketGestor ? "1" : "0"
     }&gestor=elabarca&sa=${
       checkTicketSinAtender ? "0" : "1"
-    }&fdesde=&fhasta=&busqueda=`;
+    }&fdesde=${fechaInicioGlobal}&fhasta=&busqueda=`;
     try {
       const response = await axios.get(url);
 
@@ -107,17 +108,16 @@ function App() {
   };
 
   const handleFechaInicio = async (e) => {
-    const fechaInicio = e.target.value;
-    const fechaInicioFormat = fechaInicio.split("-").join("");
+    const fechaInicio = e.target.value.split("-").join("");
+    setFechaInicioGlobal(fechaInicio);
 
     const url = `https://bio.contactek.com/bio/api_listado_base/?id=${idServicioGlobal}&mt=${
       checkTicketGestor ? "1" : "0"
     }&gestor=elabarca&sa=${
       checkTicketSinAtender ? "1" : "0"
-    }&fdesde=${fechaInicioFormat}&fhasta=&busqueda=`;
+    }&fdesde=${fechaInicio}&fhasta=&busqueda=`;
     try {
       const response = await axios.get(url);
-      console.log(url);
 
       const data = response.data;
       setInfoTickets(data);
