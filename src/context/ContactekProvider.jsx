@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, useEffect, createContext } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 
@@ -37,10 +37,14 @@ const ContactekProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleAlert = (mensaje) => {
     Swal.fire({
       icon: "warning",
-      text: mensaje,
+      title: mensaje,
       timer: 2000,
     });
   };

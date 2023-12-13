@@ -1,13 +1,11 @@
-import Tickets from "./components/Tickets";
-import InfoTickets from "./components/InfoTickets";
 import { FaEnvelope, FaBellSlash, FaFilter, FaPlus } from "react-icons/fa";
-import { useEffect } from "react";
+import Tickets from "../components/Tickets";
+import InfoTickets from "../components/InfoTickets";
 import { MdCached } from "react-icons/md";
-import useContactek from "./hooks/useContactek";
+import useContactek from "../hooks/useContactek";
 
-function App() {
+const ListadoTickets = () => {
   const {
-    fetchData,
     servicios,
     changeColorServicio,
     handleServicio,
@@ -20,10 +18,6 @@ function App() {
     infoTickets,
     tickets,
   } = useContactek();
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div className="flex gap-10 w-[95%] mx-auto">
@@ -99,6 +93,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
-export default App;
+export default ListadoTickets;
