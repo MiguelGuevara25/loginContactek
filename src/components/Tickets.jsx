@@ -10,8 +10,11 @@ import {
 } from "react-icons/fa";
 import { BsPinFill } from "react-icons/bs";
 import { IoAlertCircleOutline, IoOpenOutline } from "react-icons/io5";
+import useContactek from "../hooks/useContactek";
 
-const Tickets = ({ ticket, handleAlert }) => {
+const Tickets = ({ ticket }) => {
+  const { handleAlert } = useContactek();
+
   const {
     alerta,
     id,
