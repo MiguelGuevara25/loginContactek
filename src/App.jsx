@@ -1,27 +1,36 @@
 import { useEffect, useState } from "react";
-import {
-  FaFolderOpen,
-  FaUser,
-  FaPhoneAlt,
-  FaWhatsapp,
-  FaEnvelope,
-  FaTag,
-  FaAddressCard,
-} from "react-icons/fa";
-import { BsPinFill } from "react-icons/bs";
+import { FaEnvelope, FaBellSlash, FaFilter, FaPlus } from "react-icons/fa";
+import { MdCached } from "react-icons/md";
+import Swal from "sweetalert2";
 import axios from "axios";
+import Tickets from "./components/Tickets";
+import InfoTickets from "./components/InfoTickets";
 
 function App() {
   const [tickets, setTickets] = useState([]);
+  const [infoTickets, setInfoTickets] = useState([]);
+  const [servicios, setServicios] = useState([]);
+  const [changeColorServicio, setChangeColorServicio] = useState(false);
+  const [checkTicketGestor, setCheckTicketGestor] = useState(false);
+  const [checkTicketSinAtender, setCheckTicketSinAtender] = useState(false);
+  const [idServicioGlobal, setIdServicioGlobal] = useState("0");
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
+      const responseTickets = await axios.get(
         "https://bio.contactek.com/bio/api_listado_base/"
       );
-      const data = response.data;
-      // console.log(data);
-      setTickets(data[0].tickets);
+
+      const responseServicios = await axios.get(
+        "https://bio.contactek.com/bio/api_listado_servicio/"
+      );
+
+      const dataTickets = responseTickets.data;
+      const dataServicios = responseServicios.data;
+
+      setInfoTickets(dataTickets);
+      setTickets(dataTickets[0].tickets);
+      setServicios(dataServicios);
     } catch (error) {
       console.log(error);
     }
@@ -31,69 +40,142 @@ function App() {
     fetchData();
   }, []);
 
+  const handleAlert = (mensaje) => {
+    Swal.fire({
+      icon: "warning",
+      text: mensaje,
+      timer: 2000,
+    });
+  };
+
+  const handleServicio = async (id) => {
+    try {
+      const response = await axios.get(
+        `https://bio.contactek.com/bio/api_listado_base/?id=${id}&mt=0&gestor=elabarca&sa=0&fdesde=&fhasta=&busqueda=`
+      );
+
+      const data = response.data;
+      setInfoTickets(data);
+      setTickets(data[0].tickets);
+    } catch (error) {
+      console.log(error);
+    }
+    setChangeColorServicio(id);
+    setCheckTicketGestor(false);
+    setCheckTicketGestor(false);
+    setCheckTicketSinAtender(false);
+    setIdServicioGlobal(id);
+  };
+
+  const handleMisTickets = async () => {
+    setCheckTicketGestor(!checkTicketGestor);
+    const url = `https://bio.contactek.com/bio/api_listado_base/?id=${idServicioGlobal}&mt=${
+      checkTicketGestor ? "0" : "1"
+    }&gestor=elabarca&sa=${
+      checkTicketSinAtender ? "1" : "0"
+    }&fdesde=&fhasta=&busqueda=`;
+    try {
+      const response = await axios.get(url);
+
+      const data = response.data;
+      setInfoTickets(data);
+      setTickets(data[0].tickets);
+      console.log(url);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTicketsSinAtender = async () => {
+    setCheckTicketSinAtender(!checkTicketSinAtender);
+    const url = `https://bio.contactek.com/bio/api_listado_base/?id=${idServicioGlobal}&mt=${
+      checkTicketGestor ? "1" : "0"
+    }&gestor=elabarca&sa=${
+      checkTicketSinAtender ? "0" : "1"
+    }&fdesde=&fhasta=&busqueda=`;
+    try {
+      const response = await axios.get(url);
+
+      const data = response.data;
+      setInfoTickets(data);
+      setTickets(data[0].tickets);
+      console.log(url);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <div className="flex w-[95%] mx-auto">
-      <div className="w-1/4 h-40 bg-red-500"></div>
+    <div className="flex gap-10 w-[95%] mx-auto">
+      <div className="w-1/4">
+        <div className="flex flex-col gap-0.5">
+          {servicios.map((servicio) => {
+            const { id, nombre } = servicio;
+            return (
+              <div
+                key={id}
+                className={`${
+                  changeColorServicio === id ? "bg-blue-700" : "bg-blue-500"
+                } text-white hover:bg-blue-400 cursor-pointer pl-5 py-3 font-bold uppercase rounded-xl`}
+                onClick={() => handleServicio(id)}
+              >
+                <span>{nombre}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="w-3/4">
-        {tickets.map((ticket) => {
-          // console.log(ticket);
-          return (
-            <div
-              key={ticket.id}
-              className="flex px-12 py-3 mb-[1px] items-center rounded-2xl justify-between"
-              style={{ backgroundColor: ticket.color }}
-            >
-              <div className="flex-1">
-                <div className="flex">
-                  <span>{ticket.id}</span>
-                  <span className="flex items-center">
-                    <FaFolderOpen />
-                    Abrir
-                  </span>
-                </div>
+        <div className="flex justify-between">
+          <input type="text" placeholder="Buscar..." />
 
-                <span className="flex items-center">
-                  <FaUser /> {ticket.nombre_gestor}
-                </span>
-              </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={checkTicketGestor}
+              onChange={handleMisTickets}
+            />
+            <span>Mis Tickets</span>
+          </div>
 
-              <div className="flex flex-col flex-1">
-                <span className="flex items-center">
-                  <FaTag /> {ticket.nombre_tipologia1}
-                </span>
-                <span>{ticket.Estado}</span>
-              </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={checkTicketSinAtender}
+              onChange={handleTicketsSinAtender}
+            />
+            <span>Tickets sin atender</span>
+          </div>
 
-              <div className="flex flex-col flex-1">
-                <span className="flex items-center">
-                  <FaAddressCard /> {ticket.nombre_servicio}
-                </span>
-                <span>
-                  Creada el: <span>{ticket.fecha_inicio}</span>
-                </span>
-              </div>
-
-              <div className="flex flex-col flex-1">
-                <span className="flex items-center">
-                  <BsPinFill /> {ticket.nombre_tipologia2}
-                </span>
-                <span>
-                  Creada el: <span>{ticket.fecha_actualizado}</span>
-                </span>
-              </div>
-
-              <div className="flex flex-1 items-center justify-end gap-1">
-                {ticket.canal_phone === "1" && (
-                  <FaPhoneAlt className="text-2xl" />
-                )}
-                {ticket.canal_ws === "1" && <FaWhatsapp className="text-2xl" />}
-                {ticket.canal_mail === "1" && (
-                  <FaEnvelope className="text-2xl" />
-                )}
-              </div>
+          <div>
+            <div className="flex items-center gap-1">
+              <span className="flex-1">Desde: </span>
+              <input type="date" />
             </div>
-          );
-        })}
+
+            <div className="flex items-center gap-1">
+              <span className="flex-1">Hasta: </span>
+              <input type="date" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <MdCached className="text-2xl" />
+            <FaBellSlash className="text-2xl" />
+            <FaFilter className="text-2xl" />
+            <FaPlus className="text-2xl" />
+            <FaEnvelope className="text-2xl" />
+          </div>
+        </div>
+
+        {infoTickets.map((info, id) => (
+          <InfoTickets key={id} info={info} />
+        ))}
+
+        {tickets.map((ticket) => (
+          <Tickets key={ticket.id} ticket={ticket} handleAlert={handleAlert} />
+        ))}
       </div>
     </div>
   );
