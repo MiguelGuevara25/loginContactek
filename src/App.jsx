@@ -66,8 +66,9 @@ function App() {
     }
     setChangeColorServicio(id);
     setCheckTicketGestor(false);
-    setCheckTicketGestor(false);
     setCheckTicketSinAtender(false);
+    setFechaInicioGlobal("");
+    setFechaFinGlobal("");
     setIdServicioGlobal(id);
   };
 
@@ -77,10 +78,9 @@ function App() {
       checkTicketGestor ? "0" : "1"
     }&gestor=elabarca&sa=${
       checkTicketSinAtender ? "1" : "0"
-    }&fdesde=${fechaInicioGlobal}&fhasta=&busqueda=`;
+    }&fdesde=${fechaInicioGlobal}&fhasta=${fechaFinGlobal}&busqueda=`;
     try {
       const response = await axios.get(url);
-
       const data = response.data;
       setInfoTickets(data);
       setTickets(data[0].tickets);
@@ -95,10 +95,9 @@ function App() {
       checkTicketGestor ? "1" : "0"
     }&gestor=elabarca&sa=${
       checkTicketSinAtender ? "0" : "1"
-    }&fdesde=${fechaInicioGlobal}&fhasta=&busqueda=`;
+    }&fdesde=${fechaInicioGlobal}&fhasta=${fechaFinGlobal}&busqueda=`;
     try {
       const response = await axios.get(url);
-
       const data = response.data;
       setInfoTickets(data);
       setTickets(data[0].tickets);
@@ -115,10 +114,28 @@ function App() {
       checkTicketGestor ? "1" : "0"
     }&gestor=elabarca&sa=${
       checkTicketSinAtender ? "1" : "0"
-    }&fdesde=${fechaInicio}&fhasta=&busqueda=`;
+    }&fdesde=${fechaInicio}&fhasta=${fechaFinGlobal}&busqueda=`;
     try {
       const response = await axios.get(url);
+      const data = response.data;
+      setInfoTickets(data);
+      setTickets(data[0].tickets);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const handleFechaFin = async (e) => {
+    const fechaFin = e.target.value.split("-").join("");
+    setFechaFinGlobal(fechaFin);
+
+    const url = `https://bio.contactek.com/bio/api_listado_base/?id=${idServicioGlobal}&mt=${
+      checkTicketGestor ? "1" : "0"
+    }&gestor=elabarca&sa=${
+      checkTicketSinAtender ? "1" : "0"
+    }&fdesde=${fechaInicioGlobal}&fhasta=${fechaFin}&busqueda=`;
+    try {
+      const response = await axios.get(url);
       const data = response.data;
       setInfoTickets(data);
       setTickets(data[0].tickets);
@@ -178,7 +195,7 @@ function App() {
 
             <div className="flex items-center gap-1">
               <span className="flex-1">Hasta: </span>
-              <input type="date" />
+              <input type="date" onChange={handleFechaFin} />
             </div>
           </div>
 
