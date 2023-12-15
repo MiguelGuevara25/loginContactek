@@ -4,31 +4,25 @@ import UserPhoto from "../images/profile.svg";
 import axios from "axios";
 
 const Login = () => {
-  const [usuario, setUsuario] = useState("");
-  const [clave, setClave] = useState("");
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({
+    usuario: "",
+    clave: "",
+  });
+
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post(
-        `https://bio.contactek.com/bio/api_login/?usuario=${usuario}&clave=${clave}`,
-        {
-          usuario: usuario,
-          clave: clave,
-        }
+        "https://bio.contactek.com/bio/api_login/"
       );
 
-      if (response.status === 200) {
-        const userData = response.data;
-        setUser(userData);
-        console.log("Login exitoso:", userData);
-      } else {
-        console.error("Error al iniciar sesión");
-      }
+      console.log(response.data);
     } catch (error) {
-      console.error("Error en la solicitud:", error);
+      console.log("error");
     }
   };
 
@@ -55,15 +49,15 @@ const Login = () => {
               placeholder="Usuario"
               name="usuario"
               className="border-b-2 py-3 focus:outline-none"
-              onChange={(e) => setUsuario(e.target.value)}
+              onChange={handleChange}
             />
 
             <input
               type="text"
               placeholder="Contraseña"
-              name="contraseña"
+              name="clave"
               className="border-b-2 py-3 focus:outline-none"
-              onChange={(e) => setClave(e.target.value)}
+              onChange={handleChange}
             />
           </div>
           <button className="uppercase bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-3xl py-3 w-full font-bold">
